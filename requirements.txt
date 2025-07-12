@@ -1,4 +1,4 @@
-python-telegram-bot==20.0
+python-telegram-bot==20.8
 googletrans==4.0.0-rc1
-PyMuPDF==1.22.0
+PyMuPDF==1.26.3
 fpdf==1.7.2
