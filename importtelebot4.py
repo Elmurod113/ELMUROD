@@ -6,7 +6,7 @@ from reportlab.pdfgen import canvas
 import json 
 import os
 
-BOT_TOKEN = "7509516758:AAHG0KjB69S1IRH8H3X2DQsRBt7w9_KeQ8E"  # o'zingizning tokeningizni yozing 
+BOT_TOKEN = os.getenv("BOT_TOKEN")  # o'zingizning tokeningizni yozing 
 bot = telebot.TeleBot(BOT_TOKEN) 
 translator = Translator() 
 user_data_file = "user_data.json"
@@ -146,19 +146,28 @@ def referal_link(message):
     link = f"https://t.me/{bot.get_me().username}?start=ref_{user_id}" 
     bot.reply_to(message, f"\u2728 Do‘stlaringizni quyidagi havola orqali chaqiring {link}\n\nHar bir faol do‘st uchun 1 ta qo‘shimcha imkoniyat beriladi.")
 
-#/users komandasi (admin uchun)
+# Maxfiy admin ID (Render'dan yoki .env fayldan olinadi)
+ADMIN_ID = int(os.getenv("ADMIN_ID"))
 
-@bot.message_handler(commands=["users"]) 
-def count_users(message): 
-    user_id = str(message.from_user.id) 
-    if user_id == "5582681341":  # Bu yerga o'zingizning Telegram ID ni yozing 
-        bot.reply_to(message, f"Botdan foydalangan foydalanuvchilar soni: {len(user_data)}") 
-    else: 
-        bot.reply_to(message, "Sizda bu buyruqdan foydalanish huquqi yo'q.")
+# Har bir foydalanuvchini saqlash uchun (misol uchun)
+user_data = {}
 
+# /start komandasi
 @bot.message_handler(commands=["start"])  
 def start_handler(message): 
-    handle_start(message)
+    user_id = message.from_user.id
+    user_data[user_id] = True  # Foydalanuvchini ro'yxatga olish
+    bot.reply_to(message, "Assalomu alaykum! Xush kelibsiz.")
 
-print("Bot ishga tushdi...") 
+# /users komandasi (faqat admin uchun)
+@bot.message_handler(commands=["users"]) 
+def count_users(message): 
+    user_id = message.from_user.id
+    if user_id == ADMIN_ID:
+        bot.reply_to(message, f"Botdan foydalangan foydalanuvchilar soni: {len(user_data)}")
+    else:
+        bot.reply_to(message, "🚫 Sizda bu buyruqdan foydalanish huquqi yo'q.")
+
+# Botni ishga tushurish
+print("✅ Bot ishga tushdi...")
 bot.infinity_polling()
